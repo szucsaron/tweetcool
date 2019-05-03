@@ -1,10 +1,11 @@
 package com.codecool.web.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TweetContainer {
     private static TweetContainer tweetContainer = new TweetContainer();
-    private List<Tweet> tweets;
+    private List<Tweet> tweets = new ArrayList<>();
 
 
     public static TweetContainer getInstance() {
@@ -17,5 +18,9 @@ public class TweetContainer {
 
     public List<Tweet> getTweets() {
         return tweets;
+    }
+
+    public void clear() {
+        tweets = new ArrayList<>();
     }
 }
