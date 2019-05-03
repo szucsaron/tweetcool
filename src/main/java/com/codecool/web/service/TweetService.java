@@ -3,6 +3,7 @@ package com.codecool.web.service;
 import com.codecool.web.model.Tweet;
 import com.codecool.web.model.TweetContainer;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,17 +14,19 @@ public class TweetService {
     private static int DEFAULT_LIMIT = 20;
     private TweetContainer tweetContainer;
 
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm");
+
 
     public TweetService(TweetContainer tweetContainer) {
         this.tweetContainer = tweetContainer;
     }
 
-    public List<Tweet> getFilteredTweets(String limit, String offset, String poster, String from) {
+    public List<Tweet> getFilteredTweets(String limit, String offset, String poster, String fromDate, String fromTime) {
         try {
             poster = convertStr(poster);
-            from = convertStr(from);
+
             List<Tweet> tweets = tweetContainer.getTweets();
-            Date fromVal = parseDate(from);
+            Date fromVal = parseDate(fromDate, fromTime);
             int limitVal = getInt(limit);
             if (limitVal == 0) {
                 limitVal = DEFAULT_LIMIT;
@@ -41,8 +44,18 @@ public class TweetService {
         }
     }
 
-    public List<Tweet> getPosterTweets(String poster) {
-        return getFilteredTweets(null, null, poster, null);
+    public List<Tweet> getAllTweets() {
+        return tweetContainer.getTweets();
+    }
+
+    public void addTweet(String name, String text) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name must have value");
+        } else if (text == null) {
+            throw new IllegalArgumentException("Text must have value");
+        }
+        Date date = new Date(System.currentTimeMillis());
+        tweetContainer.add(new Tweet(date, name, text));
     }
 
     private List<Tweet> getTweets(List<Tweet> tweets, int startIndex, int endIndex, String poster, Date fromVal) {
@@ -66,16 +79,19 @@ public class TweetService {
         return true;
     }
 
-    private Date parseDate(String from) throws ParseException {
-        if (from == null) {
+    private Date parseDate(String fromDate, String fromTime) throws ParseException {
+        if (fromDate == null) {
+
             return null;
         }
-        if (from.equals("")) {
-            return null;
+        if (fromTime == null | fromTime.equals("")) {
+            fromTime = "T00:00";
         } else {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm");
-            return df.parse(from);
+            fromTime = "T" + fromTime;
         }
+
+        return dateFormat.parse(fromDate + fromTime);
+
     }
 
     private int getInt(String offset) {

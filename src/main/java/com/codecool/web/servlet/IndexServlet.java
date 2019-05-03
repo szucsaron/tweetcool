@@ -26,21 +26,20 @@ public class IndexServlet extends AbstractServlet {
         String limit = req.getParameter("limit");
         String offset = req.getParameter("offset");
         String poster = req.getParameter("poster");
-        String from = req.getParameter("from");
+        String date = req.getParameter("from_date");
+        String time = req.getParameter("from_time");
+
         TweetContainer tw = TweetContainer.getInstance();
         TweetService tweetService = new TweetService(TweetContainer.getInstance());
-        tw.clear();
-        tw.add(new Tweet(new SimpleDateFormat("yyyy-MM-dd").parse("2019-01-01"), "Áron", "Istvánricsi egy fasz"));
-        tw.add(new Tweet(new SimpleDateFormat("yyyy-MM-dd").parse("2019-02-01"), "István", "Ricsiáron egy fasz"));
-        tw.add(new Tweet(new SimpleDateFormat("yyyy-MM-dd").parse("2019-03-01"), "Ricsi", "Áronistván egy fasz"));
 
-        List<Tweet> tweets = tweetService.getFilteredTweets(limit, offset, poster, from);
+
+        List<Tweet> tweets = tweetService.getFilteredTweets(limit, offset, poster, date, time);
 
         req.setAttribute("tweets", tweets);
 
         req.getRequestDispatcher("index.jsp").forward(req, resp);
-    } catch (ParseException e) {
-        handleError(e);
+    } catch (Exception e) {
+        handleError(req, resp, e);
     }
 
     }
